@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <libudev.h>
 #include <fcntl.h>
+#include <string.h>
 
 int main() 
 {
@@ -32,12 +33,15 @@ int main()
 
 		if (dev) {
 
-			printf("Got Device\n");
-			printf("   Node: %s\n", udev_device_get_devnode(dev));
-			printf("   Subsystem: %s\n", udev_device_get_subsystem(dev));
-			printf("   Devtype: %s\n", udev_device_get_devtype(dev));
+			/*TODO is there a better way to filter the action? */
+			if (!strcmp(udev_device_get_action(dev), "add")) {
+				printf("Got Device\n");
+				printf("   Node: %s\n", udev_device_get_devnode(dev));
+				printf("   Subsystem: %s\n", udev_device_get_subsystem(dev));
+				printf("   Devtype: %s\n", udev_device_get_devtype(dev));
 
-			printf("   Action: %s\n",udev_device_get_action(dev));
+				printf("   Action: %s\n",udev_device_get_action(dev));
+			}
 		} else {
 			puts("An error occured.");
 		}
