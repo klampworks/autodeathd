@@ -3,9 +3,11 @@
 #include <libudev.h>
 #include <fcntl.h>
 #include <string.h>
+#include <syslog.h>
 
 int main() 
 {
+	openlog("autodeathd", LOG_PID|LOG_CONS, LOG_USER);
 	struct udev *udev;
 	udev = udev_new();
 
@@ -35,17 +37,20 @@ int main()
 
 			/*TODO is there a better way to filter the action? */
 			if (!strcmp(udev_device_get_action(dev), "add")) {
-				printf("Got Device\n");
-				printf("   Node: %s\n", udev_device_get_devnode(dev));
-				printf("   Subsystem: %s\n", udev_device_get_subsystem(dev));
-				printf("   Devtype: %s\n", udev_device_get_devtype(dev));
 
-				printf("   Action: %s\n",udev_device_get_action(dev));
+				syslog(LOG_INFO, "   Node: %s\n"
+					"\tSubsystem: %s\n"
+					"\tDevtype: %s\n", 
+					udev_device_get_devnode(dev),
+					udev_device_get_subsystem(dev),
+					udev_device_get_devtype(dev));
 			}
 		} else {
 			puts("An error occured.");
 		}
 	}
 	puts("Hello world.");
+
+	closelog();
 	return 0;
 }
