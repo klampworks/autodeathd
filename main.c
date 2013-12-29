@@ -49,7 +49,6 @@ int main()
 			puts("An error occured.");
 		}
 	}
-	puts("Hello world.");
 
 	closelog();
 	return 0;
