@@ -44,8 +44,22 @@ void daemonise()
 	freopen( "/dev/null", "w", stderr);	
 }
 
-int main() 
+int main(int argc, char **argv) 
 {
+	const char *command_s = NULL;
+	int command_b = 0;
+
+	if (argc < 2) {
+
+		puts("No command has been supplied.");
+	} else {
+
+		command_s = argv[1];
+		command_b = 1;
+	}
+
+	daemonise();
+
 	openlog("autodeathd", LOG_PID|LOG_CONS, LOG_USER);
 	struct udev *udev;
 	udev = udev_new();
@@ -83,6 +97,9 @@ int main()
 					udev_device_get_devnode(dev),
 					udev_device_get_subsystem(dev),
 					udev_device_get_devtype(dev));
+
+				if (command_b)
+					system(command_s);
 			}
 		} else {
 			puts("An error occured.");
