@@ -4,6 +4,45 @@
 #include <fcntl.h>
 #include <string.h>
 #include <syslog.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
+void daemonise()
+{
+	pid_t pid, sid;
+
+	/* Are we already a daemon? */
+	if (getpid() == 1)
+		return;
+
+	/* Fork from the parent process. */
+	pid = fork();
+	if (pid < 0)
+		exit(1);
+	/* If we have a good pid, exit to parent process. */
+	if (pid > 0)
+		exit(0);
+
+	/* We are now executing as the child process. */
+
+	/* Change the file mode mask. */
+	umask(0);
+
+	/* Create a new SID for the child process. */
+	sid = setsid();
+	if (sid < 0)
+		exit(1);
+
+	/* Change working directory. */
+	if (chdir("/") < 0)
+		exit(1);
+
+	/* Redirect standard files to /dev/null. */
+	freopen( "/dev/null", "r", stdin);
+	freopen( "/dev/null", "w", stdout);
+	freopen( "/dev/null", "w", stderr);	
+}
 
 int main() 
 {
@@ -49,6 +88,7 @@ int main()
 			puts("An error occured.");
 		}
 	}
+	puts("Hello world.");
 
 	closelog();
 	return 0;
